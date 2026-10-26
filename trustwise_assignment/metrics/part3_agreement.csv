@@ -1,0 +1,5 @@
+batch,model,runs,items,final_verdict_identical_all_runs,final_verdict_pairwise,decision_identical_all_runs,rule_verdict_identical_all_runs,rules_judged,unstable_items
+policy-1.0-seed20,haiku,3,100,0.96,0.9733,0.98,0.9639,471,4
+policy-1.0-seed20,luna,3,100,0.96,0.9733,0.96,0.9724,471,4
+policy-1.1-seed20,haiku,3,100,0.95,0.9667,0.97,0.9427,471,5
+policy-1.1-seed20,luna,3,100,0.98,0.9867,0.98,0.9788,471,2

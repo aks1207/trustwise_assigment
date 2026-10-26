@@ -1,0 +1,11 @@
+{
+  "run_id": "20261026T080519Z-haiku-r1",
+  "finished_at": "2026-10-26T08:06:34Z",
+  "wall_clock_s": 74.8,
+  "items": 220,
+  "items_ok": 220,
+  "items_error": 0,
+  "judge_attempts": 996,
+  "cost_usd": 0.279463,
+  "cost_usd_reported": 0.279463
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "20261026T080202Z-luna-r1",
+  "finished_at": "2026-10-26T08:03:09Z",
+  "wall_clock_s": 67.3,
+  "items": 100,
+  "items_ok": 100,
+  "items_error": 0,
+  "judge_attempts": 471,
+  "input_tokens": 430343,
+  "output_tokens": 21254,
+  "cost_usd": 0.055735
+}

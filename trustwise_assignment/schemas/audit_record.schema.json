@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit_record.schema.json",
+  "title": "AuditRecord",
+  "description": "Append-only record of one evaluation, enough to explain it and re-derive the verdict. Contains the content, the exact prompts and the raw judge replies, so it may hold PII or toxic text: store it with restricted access and a retention limit. One JSON object per line (JSONL), never rewritten.",
+  "type": "object",
+  "required": [
+    "schema_version", "execution_kind", "request_id", "engine_version", "policy", "mode", "content",
+    "started_at", "completed_at", "rules", "result"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.1" },
+    "execution_kind": {
+      "enum": ["live", "mock"],
+      "description": "Must match result.execution_kind. mock is not measured performance."
+    },
+    "request_id": { "type": "string", "description": "Same value as result.request_id." },
+    "engine_version": { "type": "string" },
+    "policy": {
+      "type": "object",
+      "required": ["name", "version", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "mode": { "enum": ["input", "output"] },
+    "content": {
+      "type": "object",
+      "required": ["text", "sha256", "truncated_text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "description": "The full content as received." },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Same preimage as result.content.sha256: SHA-256 hex of the UTF-8 bytes of json.dumps({\"mode\": mode, \"text\": text}, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")). No trimming and no Unicode normalization. Hash the original text, not truncated_text."
+        },
+        "truncated_text": { "type": ["string", "null"], "description": "The shortened text actually sent to judges, or null if no truncation." }
+      }
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "rules": {
+      "type": "array",
+      "description": "One entry per rule that ran, in policy order. Order is deterministic even though rules run in parallel.",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "judge_model", "judge_params", "calls", "final_response", "final_error"],
+        "additionalProperties": false,
+        "properties": {
+          "rule_id": { "type": "string" },
+          "judge_model": { "type": "string" },
+          "judge_params": {
+            "type": "object",
+            "description": "Temperature, max_output_tokens, timeout_s as sent.",
+            "additionalProperties": true
+          },
+          "calls": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Every attempt, in order, including failed ones.",
+            "items": {
+              "type": "object",
+              "required": [
+                "call_id", "attempt", "provider", "provider_request_id", "started_at", "completed_at", "latency_ms",
+                "system_prompt", "user_prompt", "raw_response", "parse_status", "parsed", "error", "usage"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "call_id": { "type": "string", "description": "UUID4 per judge call. Also sent to the provider as a request header or metadata where supported." },
+                "attempt": { "type": "integer", "minimum": 1 },
+                "provider": { "type": "string", "minLength": 1, "description": "Provider name, for example the API vendor. Not the model id." },
+                "provider_request_id": {
+                  "type": ["string", "null"],
+                  "description": "Id returned by the provider. Null when the call never reached the provider, such as an evaluation deadline before dispatch."
+                },
+                "started_at": { "type": "string", "format": "date-time" },
+                "completed_at": { "type": "string", "format": "date-time" },
+                "latency_ms": { "type": "integer", "minimum": 0 },
+                "system_prompt": { "type": "string", "description": "Exact text sent." },
+                "user_prompt": { "type": "string", "description": "Exact text sent, including the nonce-tagged content." },
+                "raw_response": { "type": ["string", "null"], "description": "Model output exactly as received, before any parsing or cleanup. Null if there was no response (timeout, transport error)." },
+                "parse_status": {
+                  "enum": ["ok", "no_response", "invalid_json", "missing_fields", "invalid_values", "extra_fields"],
+                  "description": "Result of validating raw_response against judge_response.schema.json."
+                },
+                "parsed": { "oneOf": [{ "type": "null" }, { "$ref": "judge_response.schema.json" }] },
+                "error": {
+                  "oneOf": [
+                    { "type": "null" },
+                    {
+                      "type": "object",
+                      "required": ["type", "message"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "enum": ["timeout", "rate_limit", "server_error", "transport_error", "client_error", "evaluation_deadline", "unparseable"]
+                        },
+                        "message": { "type": "string" }
+                      }
+                    }
+                  ]
+                },
+                "usage": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Token counts and cost as reported by the provider. A missing figure is null, never 0. pricing_version is null when cost_usd is null.",
+                  "required": ["input_tokens", "output_tokens", "cost_usd", "pricing_version"],
+                  "properties": {
+                    "input_tokens": { "type": ["integer", "null"], "minimum": 0 },
+                    "output_tokens": { "type": ["integer", "null"], "minimum": 0 },
+                    "cost_usd": { "type": ["number", "null"], "minimum": 0 },
+                    "pricing_version": { "type": ["string", "null"] }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": { "properties": { "parse_status": { "const": "ok" } }, "required": ["parse_status"] },
+                  "then": {
+                    "properties": {
+                      "raw_response": { "type": "string" },
+                      "parsed": { "$ref": "judge_response.schema.json" },
+                      "error": { "type": "null" }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": { "parse_status": { "enum": ["no_response", "invalid_json", "missing_fields", "invalid_values", "extra_fields"] } },
+                    "required": ["parse_status"]
+                  },
+                  "then": {
+                    "properties": {
+                      "parsed": { "type": "null" },
+                      "error": { "type": "object" }
+                    }
+                  }
+                },
+                {
+                  "if": { "properties": { "parse_status": { "const": "no_response" } }, "required": ["parse_status"] },
+                  "then": { "properties": { "raw_response": { "type": "null" } } }
+                },
+                {
+                  "if": {
+                    "properties": { "parse_status": { "enum": ["invalid_json", "missing_fields", "invalid_values", "extra_fields"] } },
+                    "required": ["parse_status"]
+                  },
+                  "then": {
+                    "properties": {
+                      "raw_response": { "type": "string" },
+                      "error": { "properties": { "type": { "const": "unparseable" } }, "required": ["type"] }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "final_response": { "oneOf": [{ "type": "null" }, { "$ref": "judge_response.schema.json" }], "description": "The parsed response the engine used. Null if every attempt failed." },
+          "final_error": {
+            "oneOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "required": ["type", "message"],
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "enum": ["timeout", "rate_limit", "server_error", "transport_error", "client_error", "evaluation_deadline", "unparseable"]
+                  },
+                  "message": { "type": "string" }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "result": { "$ref": "evaluation_result.schema.json", "description": "The exact result returned to the caller." }
+  }
+}

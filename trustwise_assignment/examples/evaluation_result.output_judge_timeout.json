@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "execution_kind": "mock",
+  "request_id": "a91e77d0-2c4f-4f0e-8d3b-5e6f7a8b9c0d",
+  "policy_name": "content_safety_policy",
+  "policy_version": "1.1",
+  "policy_sha256": "7dfe93f2d001d5f90c18035534cc4861c91344c3251e39c30250370a346f06cd",
+  "mode": "output",
+  "evaluated_at": "2026-10-24T10:31:07.004Z",
+  "evaluation_strategy": "weighted_threshold",
+  "threshold": 0.5,
+  "score": 0.0,
+  "final_verdict": "REVIEW",
+  "decision_reason": "needs_review",
+  "triggered_rules": [],
+  "uncertain_rules": [
+    "no_pii"
+  ],
+  "review_reasons": [
+    "judge_error"
+  ],
+  "rule_results": [
+    {
+      "rule_id": "no_pii",
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Judge call did not return a valid response after 3 attempts (timeout).",
+      "action": "review",
+      "weight": 1.0,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 3,
+      "latency_ms": 61540,
+      "error": {
+        "type": "timeout",
+        "message": "no response within 20s on each of 3 attempts"
+      }
+    },
+    {
+      "rule_id": "no_toxic_language",
+      "verdict": "PASS",
+      "confidence": 0.96,
+      "reasoning": "Neutral business summary.",
+      "action": "none",
+      "weight": 0.8,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 530,
+      "error": null
+    },
+    {
+      "rule_id": "no_unsafe_content",
+      "verdict": "PASS",
+      "confidence": 0.97,
+      "reasoning": "Nothing sexual, graphic or dangerous.",
+      "action": "none",
+      "weight": 0.8,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 512,
+      "error": null
+    }
+  ],
+  "skipped_rules": [
+    {
+      "rule_id": "no_jailbreak",
+      "reason": "not_applicable_to_mode"
+    },
+    {
+      "rule_id": "no_prompt_injection",
+      "reason": "not_applicable_to_mode"
+    },
+    {
+      "rule_id": "no_prompt_extraction",
+      "reason": "not_applicable_to_mode"
+    }
+  ],
+  "content": {
+    "sha256": "645e5030dfd8a0d38293cc4ea3f8f97c5e4a13db1de32ebcda678d190ff16979",
+    "chars": 68,
+    "truncated": false
+  },
+  "totals": {
+    "attempt_count": 5,
+    "input_tokens": null,
+    "output_tokens": null,
+    "cost_usd": null
+  },
+  "total_latency_ms": 61545
+}

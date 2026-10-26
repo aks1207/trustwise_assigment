@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "judge_response.schema.json",
+  "title": "JudgeResponse",
+  "description": "What a judge model must return for one rule. This is the contract the parser enforces on the raw model text. Anything that fails it is a parse failure (retry, then UNCERTAIN with error.type=unparseable).",
+  "type": "object",
+  "required": ["verdict", "confidence", "reasoning"],
+  "additionalProperties": false,
+  "properties": {
+    "verdict": { "enum": ["PASS", "FAIL", "UNCERTAIN"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "reasoning": { "type": "string" }
+  }
+}

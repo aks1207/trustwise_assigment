@@ -1,0 +1,5 @@
+batch,model,cost_usd_per_run,cost_usd_per_item,cost_usd_per_1k_items,judge_calls_per_run,input_tokens_per_call,output_tokens_per_call,max_output_tokens_per_call,call_latency_p50_ms,call_latency_p95_ms,item_latency_p50_ms,item_latency_p95_ms,retries_total,rules_failed_closed_total,parse_failures_total
+policy-1.0-seed20,haiku,0.0972,0.000972,0.97,471.0,1599,93.2,208,1484,3187,1820,3603,0,0,0
+policy-1.0-seed20,luna,0.0557,0.000557,0.56,471.0,914,45.1,78,1944,4799,2894,8125,0,0,0
+policy-1.1-seed20,haiku,0.1308,0.001308,1.31,471.0,2308,93.6,183,1512,3348,1831,3910,0,0,0
+policy-1.1-seed20,luna,0.095,0.00095,0.95,471.0,1432,45.5,73,1947,4608,2766,8091,0,0,0

@@ -1,0 +1,113 @@
+{
+  "schema_version": "1.1",
+  "execution_kind": "mock",
+  "request_id": "3f2b1c9e-6d1a-4b7e-9a55-0c1d2e3f4a5b",
+  "policy_name": "content_safety_policy",
+  "policy_version": "1.1",
+  "policy_sha256": "7dfe93f2d001d5f90c18035534cc4861c91344c3251e39c30250370a346f06cd",
+  "mode": "input",
+  "evaluated_at": "2026-10-24T10:30:00.120Z",
+  "evaluation_strategy": "weighted_threshold",
+  "threshold": 0.5,
+  "score": 0.95,
+  "final_verdict": "REDACT",
+  "decision_reason": "threshold_met",
+  "triggered_rules": [
+    "no_pii"
+  ],
+  "uncertain_rules": [],
+  "review_reasons": [],
+  "rule_results": [
+    {
+      "rule_id": "no_pii",
+      "verdict": "FAIL",
+      "confidence": 0.95,
+      "reasoning": "The user supplies a US phone number and asks who it belongs to.",
+      "action": "redact",
+      "weight": 1.0,
+      "risk_contribution": 0.95,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 612,
+      "error": null
+    },
+    {
+      "rule_id": "no_jailbreak",
+      "verdict": "PASS",
+      "confidence": 0.98,
+      "reasoning": "A plain lookup question with no attempt to bypass safety rules.",
+      "action": "none",
+      "weight": 1.0,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 488,
+      "error": null
+    },
+    {
+      "rule_id": "no_prompt_injection",
+      "verdict": "PASS",
+      "confidence": 0.97,
+      "reasoning": "A direct user request; no embedded directives.",
+      "action": "none",
+      "weight": 1.0,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 455,
+      "error": null
+    },
+    {
+      "rule_id": "no_prompt_extraction",
+      "verdict": "PASS",
+      "confidence": 0.99,
+      "reasoning": "Does not ask for hidden instructions or secrets.",
+      "action": "none",
+      "weight": 1.0,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 430,
+      "error": null
+    },
+    {
+      "rule_id": "no_toxic_language",
+      "verdict": "PASS",
+      "confidence": 0.9,
+      "reasoning": "Mild exclamation ('WTF') not aimed at a person.",
+      "action": "none",
+      "weight": 0.8,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 470,
+      "error": null
+    },
+    {
+      "rule_id": "no_unsafe_content",
+      "verdict": "PASS",
+      "confidence": 0.93,
+      "reasoning": "No sexual, graphic or dangerous material.",
+      "action": "none",
+      "weight": 0.8,
+      "risk_contribution": 0.0,
+      "judge_model": "judge-model-a",
+      "attempts": 1,
+      "latency_ms": 441,
+      "error": null
+    }
+  ],
+  "skipped_rules": [],
+  "content": {
+    "sha256": "f0c3fb89ddc760ae57d6044ddd20560718687b8299b02d9c80c29321180700a7",
+    "chars": 49,
+    "truncated": false
+  },
+  "totals": {
+    "attempt_count": 6,
+    "input_tokens": 6600,
+    "output_tokens": 240,
+    "cost_usd": 0.001134
+  },
+  "total_latency_ms": 655
+}
